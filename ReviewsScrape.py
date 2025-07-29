@@ -1,3 +1,4 @@
+import random
 import re
 import sqlite3
 import time
@@ -33,18 +34,24 @@ def insert_reviews(cursor, reviews):
 
 
 
+def sleep_randomly(x, y):
+    seconds = random.randint(x, y)
+    #print(f"🕒 Sleeping for {seconds} seconds...")
+    time.sleep(seconds)
 
-def scrape_and_store_reviews(driver, cursor, url, restaurant_id, max_scrolls=2):
+def scrape_and_store_reviews(driver, cursor, url, restaurant_id, max_scrolls=20):
 
     print(f"🔍 Scraping reviews for restaurant ID {restaurant_id}")
     driver.get(url)
-    time.sleep(4)
+    sleep_randomly(3, 4)
+    #time.sleep(4)
 
     # Step 1: Click the 'ביקורות' tab
     try:
         review_tab = driver.find_element(By.XPATH, '//button[.//div[contains(text(),"ביקורות")]]')
         review_tab.click()
-        time.sleep(2)
+        sleep_randomly(2, 3)
+        #time.sleep(2)
     except Exception as e:
         print("❌ Could not click 'ביקורות' tab:", e)
         return
@@ -54,7 +61,8 @@ def scrape_and_store_reviews(driver, cursor, url, restaurant_id, max_scrolls=2):
         scrollable_div = driver.find_element(By.XPATH, '//div[@class="m6QErb DxyBCb kA9KIf dS8AEf XiKgde "]')
         for _ in range(max_scrolls):
             driver.execute_script('arguments[0].scrollTop = arguments[0].scrollHeight', scrollable_div)
-            time.sleep(1.5)
+            sleep_randomly(1, 3)
+            #time.sleep(1.5)
     except Exception as e:
         print("❌ Could not scroll reviews:", e)
 
@@ -116,8 +124,7 @@ def scrape_and_store_reviews(driver, cursor, url, restaurant_id, max_scrolls=2):
 
 
 
-
-def scrape_all_reviews_for_pending_restaurants(db_path=DB_PATH, limit=1):
+def scrape_all_reviews_for_pending_restaurants(db_path=DB_PATH, limit=1, maxScrolls = 20):
     # Setup DB
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -134,6 +141,7 @@ def scrape_all_reviews_for_pending_restaurants(db_path=DB_PATH, limit=1):
         cursor.execute("""
             SELECT id, url FROM restaurants
             WHERE id NOT IN (SELECT DISTINCT restaurant_id FROM reviews)
+            ORDER BY id ASC
             LIMIT ?
         """, (limit,))
         restaurants = cursor.fetchall()
@@ -143,8 +151,9 @@ def scrape_all_reviews_for_pending_restaurants(db_path=DB_PATH, limit=1):
         for restaurant_id, url in restaurants:
             print(f"\n📌 Scraping restaurant ID {restaurant_id}")
             try:
-                scrape_and_store_reviews(driver, cursor, url, restaurant_id)
+                scrape_and_store_reviews(driver, cursor, url, restaurant_id, maxScrolls)
                 conn.commit()
+                sleep_randomly(10, 25)
             except Exception as e:
                 print(f"❌ Failed to scrape restaurant {restaurant_id}: {e}")
 

@@ -38,7 +38,7 @@ def insert_restaurant(cursor, name, url, rating, review_count, city):
 
 def start_driver():
     options = Options()
-    #options.add_argument("--headless")  # This hides the browser window
+    options.add_argument("--headless")  # This hides the browser window
     options.add_argument("--disable-gpu")  # (optional but recommended for headless mode)
     options.add_argument("--window-size=1920,1080")  # Set a standard window size
     options.add_argument("--no-sandbox")  # Useful for some Linux systems
