@@ -7,6 +7,6 @@ if __name__ == '__main__':
 
     #scrapeRestaurantsRatings()
 
-    NUM_OF_RESTAURANTS = 10
+    NUM_OF_RESTAURANTS = 50
     MAX_SCROLLS = 20
     scrape_all_reviews_for_pending_restaurants(limit=NUM_OF_RESTAURANTS, maxScrolls=MAX_SCROLLS)
