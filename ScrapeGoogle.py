@@ -29,9 +29,10 @@ def init_db(db_path=DB_PATH):
 
 def insert_restaurant(cursor, name, url, rating, review_count, city):
     cursor.execute("""
-        INSERT OR IGNORE INTO restaurants (name, url, rating, review_count, city)
-        VALUES (?, ?, ?, ?, ?)
-    """, (name, url, rating, review_count, city))
+        INSERT OR IGNORE INTO restaurants (name, url, rating, review_count, city,
+        rating_1_count = ?, rating_2_count = ?, rating_3_count = ?, rating_4_count = ?, rating_5_count = ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (name, url, rating, review_count, city, None, None, None, None, None))
 
 
 # === SELENIUM FUNCTIONS ===
@@ -189,7 +190,7 @@ def scrape_and_update_rating_distribution(driver, conn, cursor, limit=10):
 # === MAIN FLOW ===
 
 def scrapeRestaurantNamesAndURL():
-    query = "מסעדות בתל אביב"
+    query = "מסעדות בירושלים"
     city = extract_city_from_query(query)
 
     # Initialize DB
